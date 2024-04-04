@@ -63,6 +63,7 @@ model WordSubtitle {
 model Quiz {
   id          Int      @id @default(autoincrement())
   videoId     Int
+  videoUrl    String?  @db.VarChar(255)
   description String   @db.VarChar(255)
   choice      Json
   createdAt   DateTime @default(now())
