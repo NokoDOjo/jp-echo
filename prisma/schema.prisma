@@ -74,11 +74,11 @@ model Quiz {
 }
 
 model Step {
-  stepId      Int         @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   videoId     Int
   title       String      @db.VarChar(255)
   description String?     @db.Text
-  step        StepType
+  type        StepType
   subType     StepSubType
   order       Int
   createdAt   DateTime    @default(now())
