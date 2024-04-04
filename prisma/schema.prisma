@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(255)
+  description String?
+  url         String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  Subtitle    Subtitle[]
+  Quiz        Quiz[]
+}
+
+model Subtitle {
+  id                   Int            @id @default(autoincrement())
+  videoId              Int
+  s3Path               String?        @db.VarChar(255)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @default(now()) @updatedAt
+  video                Video          @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  WordSubtitleRelation WordSubtitle[]
+
+  @@index([videoId], name: "fk_subtitles_video_id")
+}
+
+model Word {
+  id                   Int            @id @default(autoincrement())
+  japanese             String         @db.VarChar(255)
+  chinese              String         @db.VarChar(255)
+  jlptLevel            Int?           @db.SmallInt
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @default(now()) @updatedAt
+  WordSubtitleRelation WordSubtitle[]
+}
+
+model WordSubtitle {
+  wordId         Int
+  subtitleId     Int
+  timestampStart Int
+  timestampEnd   Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  word     Word      @relation(fields: [wordId], references: [id])
+  Subtitle Subtitle? @relation(fields: [subtitleId], references: [id])
+
+  @@id([wordId, subtitleId])
+}
+
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  videoId     Int
+  description String   @db.VarChar(255)
+  choice      Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId], name: "fk_quizzes_video_id")
+}
+
+model Step {
+  stepId      Int         @id @default(autoincrement())
+  videoId     Int
+  title       String      @db.VarChar(255)
+  description String?     @db.Text
+  step        StepType
+  subType     StepSubType
+  order       Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+}
+
+enum StepType {
+  VIDEO
+  QUIZ
+}
+
+enum StepSubType {
+  noSubtitle
+  practiceKeyword
+  jpKeyword
+  jpSubtitle
+  MCQ
+}
