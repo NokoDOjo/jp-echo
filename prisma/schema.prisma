@@ -88,6 +88,7 @@ model Step {
 enum StepType {
   VIDEO
   QUIZ
+  COMPLETE
 }
 
 enum StepSubType {
