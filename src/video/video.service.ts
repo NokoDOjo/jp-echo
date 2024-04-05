@@ -22,21 +22,21 @@ export class VideoService {
         id: videoId,
       },
       include: {
-        Subtitle: {
+        subtitle: {
           include: {
-            WordSubtitleRelation: {
+            wordSubtitleRelation: {
               include: {
                 word: true,
               },
             },
           },
         },
-        Quiz: true,
+        quiz: true,
       },
     });
 
-    console.log(video.Subtitle[0].WordSubtitleRelation);
-    console.log(video.Quiz[0].choice);
+    console.log(video.subtitle);
+    console.log(video.quiz);
 
     return { steps, video };
   }

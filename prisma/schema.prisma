@@ -20,8 +20,8 @@ model Video {
   url         String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @default(now()) @updatedAt
-  Subtitle    Subtitle[]
-  Quiz        Quiz[]
+  subtitle    Subtitle[]
+  quiz        Quiz[]
 }
 
 model Subtitle {
@@ -31,7 +31,7 @@ model Subtitle {
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @default(now()) @updatedAt
   video                Video          @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  WordSubtitleRelation WordSubtitle[]
+  wordSubtitleRelation WordSubtitle[]
 
   @@index([videoId], name: "fk_subtitles_video_id")
 }
@@ -43,7 +43,7 @@ model Word {
   jlptLevel            Int?           @db.SmallInt
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @default(now()) @updatedAt
-  WordSubtitleRelation WordSubtitle[]
+  wordSubtitleRelation WordSubtitle[]
 }
 
 model WordSubtitle {
@@ -55,7 +55,7 @@ model WordSubtitle {
   updatedAt      DateTime @default(now()) @updatedAt
 
   word     Word      @relation(fields: [wordId], references: [id])
-  Subtitle Subtitle? @relation(fields: [subtitleId], references: [id])
+  subtitle Subtitle? @relation(fields: [subtitleId], references: [id])
 
   @@id([wordId, subtitleId])
 }
