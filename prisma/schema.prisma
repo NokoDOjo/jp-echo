@@ -14,19 +14,19 @@ datasource db {
 }
 
 model Video {
-  id          Int        @id @default(autoincrement())
-  title       String     @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
   description String?
   url         String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now()) @updatedAt
-  subtitle    Subtitle[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  subtitle    Subtitle?
   quiz        Quiz[]
 }
 
 model Subtitle {
   id                   Int            @id @default(autoincrement())
-  videoId              Int
+  videoId              Int            @unique
   s3Path               String?        @db.VarChar(255)
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @default(now()) @updatedAt
