@@ -1,4 +1,6 @@
 import { PrismaClient, StepSubType, StepType } from '@prisma/client';
+import * as fs from 'fs';
+import * as util from 'util';
 
 const prisma = new PrismaClient();
 
@@ -6,62 +8,52 @@ const wordData = [
   {
     japanese: 'すみません',
     chinese: '不好意思',
-    timeStampStart: 999,
-    timeStampEnd: 2050,
+    subtitleLineId: 53,
   },
   {
     japanese: '何名様ですか',
     chinese: '請問幾位',
-    timeStampStart: 2050,
-    timeStampEnd: 4195,
+    subtitleLineId: 51,
   },
   {
     japanese: '大丈夫',
     chinese: '沒問題',
-    timeStampStart: 38444,
-    timeStampEnd: 47069,
+    subtitleLineId: 55,
   },
   {
     japanese: 'お願いします',
     chinese: '拜託',
-    timeStampStart: 62385,
-    timeStampEnd: 69979,
+    subtitleLineId: 53,
   },
   {
     japanese: '大変お待たせしました',
     chinese: '讓您久等了',
-    timeStampStart: 367655,
-    timeStampEnd: 370830,
+    subtitleLineId: 102,
   },
   {
     japanese: 'お会計',
     chinese: '結帳',
-    timeStampStart: 110609,
-    timeStampEnd: 118329,
+    subtitleLineId: 118,
   },
   {
     japanese: 'かしこまりました',
     chinese: '我瞭解了',
-    timeStampStart: 352495,
-    timeStampEnd: 358660,
+    subtitleLineId: 54,
   },
   {
     japanese: '注文',
     chinese: '點餐',
-    timeStampStart: 90990,
-    timeStampEnd: 101069,
+    subtitleLineId: 53,
   },
   {
     japanese: '少々お待ちください',
     chinese: '請稍等我一下',
-    timeStampStart: 401802,
-    timeStampEnd: 411461,
+    subtitleLineId: 62,
   },
   {
     japanese: 'お願いします',
     chinese: '準備好為您服務',
-    timeStampStart: 110609,
-    timeStampEnd: 118329,
+    subtitleLineId: 84,
   },
 ];
 
@@ -117,6 +109,10 @@ const stepsData = [
 ];
 
 async function main() {
+  const readFile = util.promisify(fs.readFile);
+  const data = await readFile('src/common/srt/test.srt', 'utf8');
+  const entries = data.split(/\r?\n\r?\n/);
+
   const video = await prisma.video.upsert({
     where: { id: 1 },
     update: {},
@@ -153,6 +149,29 @@ async function main() {
     },
   });
 
+  entries.map(async (entry) => {
+    const lines = entry.split(/\r?\n/);
+    if (lines.length >= 3) {
+      const index = parseInt(lines[0], 10);
+      const times = lines[1].split(' --> ');
+      const timestampStart = convertTimeToMs(times[0]);
+      const timestampEnd = convertTimeToMs(times[1]);
+      const line = lines.slice(2).join('\\n');
+      await prisma.subtitleLine.upsert({
+        where: { id: index },
+        update: {},
+        create: {
+          id: index,
+          subtitleId: subtitle.id,
+          lineIndex: index,
+          timestampStart,
+          timestampEnd,
+          line,
+        },
+      });
+    }
+  });
+
   for (let i = 1; i <= wordData.length; i++) {
     await prisma.word.upsert({
       where: { id: i },
@@ -161,28 +180,13 @@ async function main() {
         id: i,
         japanese: wordData[i - 1].japanese,
         chinese: wordData[i - 1].chinese,
+        subtitleLineId: wordData[i - 1].subtitleLineId,
       },
-    });
-
-    await prisma.wordSubtitle.upsert({
-      where: {
-        wordId_subtitleId: {
-          wordId: i,
-          subtitleId: 1,
-        },
-      },
-      create: {
-        wordId: i,
-        subtitleId: 1,
-        timestampStart: wordData[i - 1].timeStampStart,
-        timestampEnd: wordData[i - 1].timeStampEnd,
-      },
-      update: {},
     });
   }
 
   for (let i = 1; i <= stepsData.length; i++) {
-    const step =await prisma.step.upsert({
+    const step = await prisma.step.upsert({
       where: { id: i },
       update: {},
       create: {
@@ -191,8 +195,18 @@ async function main() {
         videoId: 1,
       },
     });
-    console.log(step)
   }
+}
+
+function convertTimeToMs(timeStr: string): number {
+  const [hours, minutes, secondsMs] = timeStr.split(':');
+  const [seconds, milliseconds] = secondsMs.split(',');
+  return (
+    parseInt(hours, 10) * 3600000 +
+    parseInt(minutes, 10) * 60000 +
+    parseInt(seconds, 10) * 1000 +
+    parseInt(milliseconds, 10)
+  );
 }
 
 // execute the main function

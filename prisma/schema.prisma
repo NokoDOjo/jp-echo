@@ -25,39 +25,42 @@ model Video {
 }
 
 model Subtitle {
-  id                   Int            @id @default(autoincrement())
-  videoId              Int            @unique
-  s3Path               String?        @db.VarChar(255)
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @default(now()) @updatedAt
-  video                Video          @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  wordSubtitleRelation WordSubtitle[]
+  id           Int            @id @default(autoincrement())
+  videoId      Int            @unique
+  s3Path       String?        @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+  video        Video          @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  subtitleLine SubtitleLine[]
 
   @@index([videoId], name: "fk_subtitles_video_id")
 }
 
-model Word {
-  id                   Int            @id @default(autoincrement())
-  japanese             String         @db.VarChar(255)
-  chinese              String         @db.VarChar(255)
-  jlptLevel            Int?           @db.SmallInt
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @default(now()) @updatedAt
-  wordSubtitleRelation WordSubtitle[]
-}
-
-model WordSubtitle {
-  wordId         Int
+model SubtitleLine {
+  id             Int      @id @default(autoincrement())
   subtitleId     Int
+  lineIndex      Int
+  line           String
   timestampStart Int
   timestampEnd   Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now()) @updatedAt
 
-  word     Word      @relation(fields: [wordId], references: [id])
-  subtitle Subtitle? @relation(fields: [subtitleId], references: [id])
+  subtitle Subtitle @relation(fields: [subtitleId], references: [id])
+  word     Word[]
 
-  @@id([wordId, subtitleId])
+  @@index([subtitleId], name: "fk_subtitle_lines_subtitle_id")
+}
+
+model Word {
+  id             Int           @id @default(autoincrement())
+  japanese       String        @db.VarChar(255)
+  chinese        String        @db.VarChar(255)
+  jlptLevel      Int?          @db.SmallInt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+  subtitleLineId Int?
+  subtitleLine   SubtitleLine? @relation(fields: [subtitleLineId], references: [id])
 }
 
 model Quiz {
