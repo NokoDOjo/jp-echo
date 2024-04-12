@@ -9,4 +9,9 @@ export class VideoController {
   getSteps(@Param('id') id: string) {
     return this.videoService.getVideoDetail(Number(id));
   }
+
+  @Get(':id/subtitle')
+  getSubtitle(@Param('id') id: string) {
+    return this.videoService.getSubtitle(Number(id));
+  }
 }

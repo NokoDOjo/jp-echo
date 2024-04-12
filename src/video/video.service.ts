@@ -58,4 +58,18 @@ export class VideoService {
 
     return { steps, url: video.url, keywords, quiz: video.quiz };
   }
+
+  async getSubtitle(videoId: number) {
+    const subtitle = await this.prismaService.subtitle.findUnique({
+      where: { videoId },
+    });
+    return this.prismaService.subtitleLine.findMany({
+      where: {
+        subtitle,
+      },
+      orderBy: {
+        lineIndex: 'asc',
+      },
+    });
+  }
 }
