@@ -149,7 +149,7 @@ async function main() {
     },
   });
 
-  entries.map(async (entry) => {
+  for (const entry of entries) {
     const lines = entry.split(/\r?\n/);
     if (lines.length >= 3) {
       const index = parseInt(lines[0], 10);
@@ -170,7 +170,7 @@ async function main() {
         },
       });
     }
-  });
+  }
 
   for (let i = 1; i <= wordData.length; i++) {
     await prisma.word.upsert({
