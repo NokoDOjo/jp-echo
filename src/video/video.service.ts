@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Step, Video } from '@prisma/client';
+import { Quiz, Step, Video } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { StepService } from 'src/step/step.service';
 
 type VideoDetail = {
-  video: Video;
   steps: Step[];
-}
+  url: string;
+  keywords: Keyword[];
+  quiz: Quiz[];
+};
+
+type Keyword = {
+  japanese: string;
+  chinese: string;
+  timestampStart: number;
+  timestampEnd: number;
+};
 
 @Injectable()
 export class VideoService {
@@ -35,9 +44,13 @@ export class VideoService {
       },
     });
 
-    console.log(video.subtitle);
-    console.log(video.quiz);
-
-    return { steps, video };
+    const keywords = video.subtitle.wordSubtitleRelation.map((wordRelation) =>
+      Object.assign(wordRelation.word, {
+        timestampStart: wordRelation.timestampStart,
+        timestampEnd: wordRelation.timestampEnd,
+      }),
+    );
+    
+    return { steps, url: video.url, keywords, quiz: video.quiz };
   }
 }
