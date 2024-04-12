@@ -33,7 +33,7 @@ export class VideoService {
       include: {
         subtitle: {
           include: {
-            wordSubtitleRelation: {
+            subtitleLine: {
               include: {
                 word: true,
               },
@@ -44,13 +44,18 @@ export class VideoService {
       },
     });
 
-    const keywords = video.subtitle.wordSubtitleRelation.map((wordRelation) =>
-      Object.assign(wordRelation.word, {
-        timestampStart: wordRelation.timestampStart,
-        timestampEnd: wordRelation.timestampEnd,
-      }),
-    );
-    
+    const keywords = [];
+    video.subtitle.subtitleLine.forEach((line) => {
+      line.word.forEach((word) => {
+        keywords.push({
+          japanese: word.japanese,
+          chinese: word.chinese,
+          timestampStart: line.timestampStart,
+          timestampEnd: line.timestampEnd,
+        });
+      });
+    });
+
     return { steps, url: video.url, keywords, quiz: video.quiz };
   }
 }
