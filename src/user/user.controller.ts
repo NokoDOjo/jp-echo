@@ -1,52 +1,40 @@
 import {
   Body,
   Controller,
+  Get,
   InternalServerErrorException,
   Post,
-  Res,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignInDto } from './dto/sign-in.dto';
-import { User } from '@prisma/client';
-import { Response } from 'express';
+import { Request } from 'express';
+import { AccessToken } from 'src/types/auth/access-token.type';
+import { JwtAuthGuard } from 'src/guards/auth/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/auth/sign-up')
-  async signUp(
-    @Body() newUser: SignInDto,
-    @Res() res: Response,
-  ): Promise<void> {
-    try {
-      const { user, token }: { user: Partial<User>; token: string } =
-        await this.userService.signUp(newUser);
-
-      delete user.password;
-
-      res.cookie('access-token', token, { httpOnly: true });
-
-      res.status(201).send({ user: user });
-    } catch (err: unknown) {
-      throw new InternalServerErrorException(err);
-    }
+  async signUp(@Body() newUser: SignInDto): Promise<AccessToken> {
+    return await this.userService.signUp(newUser);
   }
 
   @Post('/auth/sign-in')
-  async signIn(
-    @Body() user: SignInDto,
-    @Res() res: Response,
-  ): Promise<void> {
+  async signIn(@Body() user: SignInDto): Promise<AccessToken> {
+    return await this.userService.signIn(user);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getMe(@Req() req: Request) {
     try {
-      const { user: signedInUser, token }: { user: Partial<User>; token: string } =
-        await this.userService.signIn(user);
-
-      delete signedInUser.password;
-
-      res.cookie('access-token', token, { httpOnly: true });
-
-      res.status(200).send({ user: signedInUser });
+      delete req.user['password'];
+      return req.user;
     } catch (err: unknown) {
       throw new InternalServerErrorException(err);
     }
