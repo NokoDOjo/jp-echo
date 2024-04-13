@@ -121,7 +121,7 @@ async function main() {
     update: {},
     create: {
       id: userId,
-      username: 'root',
+      email: 'root@example.com',
       password,
       role: 'ADMIN',
     },
