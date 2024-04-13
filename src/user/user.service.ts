@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SignInDto } from './dto/sign-in.dto';
@@ -22,5 +22,28 @@ export class UserService {
     );
 
     return { user: newUser, token };
+  }
+
+  async signIn(user: SignInDto) {
+    const foundUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+
+    if (!foundUser) throw new Error('User not found');
+
+    const isPasswordValid = await bcrypt.compare(
+      user.password,
+      foundUser.password,
+    );
+
+    if (!isPasswordValid)
+      throw new UnauthorizedException();
+
+    const token = await this.jwtService.signAsync(
+      {},
+      { jwtid: uuidv4(), subject: foundUser.id },
+    );
+
+    return { user: foundUser, token };
   }
 }

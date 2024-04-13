@@ -32,4 +32,23 @@ export class UserController {
       throw new InternalServerErrorException(err);
     }
   }
+
+  @Post('/auth/sign-in')
+  async signIn(
+    @Body() user: SignInDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const { user: signedInUser, token }: { user: Partial<User>; token: string } =
+        await this.userService.signIn(user);
+
+      delete signedInUser.password;
+
+      res.cookie('access-token', token, { httpOnly: true });
+
+      res.status(200).send({ user: signedInUser });
+    } catch (err: unknown) {
+      throw new InternalServerErrorException(err);
+    }
+  }
 }
