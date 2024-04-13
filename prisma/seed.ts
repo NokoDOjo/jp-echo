@@ -1,6 +1,8 @@
 import { PrismaClient, StepSubType, StepType } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import * as util from 'util';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -112,12 +114,25 @@ async function main() {
   const readFile = util.promisify(fs.readFile);
   const data = await readFile('src/common/srt/test.srt', 'utf8');
   const entries = data.split(/\r?\n\r?\n/);
+  const userId = randomUUID();
+  const password = bcrypt.hashSync('root', 10);
+  const user = await prisma.user.upsert({
+    where: { id: userId },
+    update: {},
+    create: {
+      id: userId,
+      username: 'root',
+      password,
+      role: 'ADMIN',
+    },
+  });
 
   const video = await prisma.video.upsert({
     where: { id: 1 },
     update: {},
     create: {
       id: 1,
+      userId: user.id,
       title: '日文點餐',
       url: 'https://www.youtube.com/watch?v=vd6mwUSiS40',
     },

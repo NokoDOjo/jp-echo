@@ -18,10 +18,12 @@ model Video {
   title       String    @db.VarChar(255)
   description String?
   url         String
+  userId      String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
   subtitle    Subtitle?
   quiz        Quiz[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subtitle {
@@ -89,6 +91,24 @@ model Step {
   updatedAt   DateTime    @default(now()) @updatedAt
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  username  String   @unique
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  Video     Video[]
+}
+
+model RevokedToken {
+  id        Int      @id @default(autoincrement())
+  tokenId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
 enum StepType {
   VIDEO
   QUIZ
@@ -101,4 +121,9 @@ enum StepSubType {
   jpKeyword
   jpSubtitle
   MCQ
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
