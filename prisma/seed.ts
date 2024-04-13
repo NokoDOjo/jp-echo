@@ -117,7 +117,7 @@ async function main() {
   const userId = randomUUID();
   const password = bcrypt.hashSync('Root12345678', 10);
   const user = await prisma.user.upsert({
-    where: { id: userId },
+    where: { id: userId, email: 'root@example.com' },
     update: {},
     create: {
       id: userId,
