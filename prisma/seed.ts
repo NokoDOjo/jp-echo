@@ -115,7 +115,7 @@ async function main() {
   const data = await readFile('src/common/srt/test.srt', 'utf8');
   const entries = data.split(/\r?\n\r?\n/);
   const userId = randomUUID();
-  const password = bcrypt.hashSync('root', 10);
+  const password = bcrypt.hashSync('Root12345678', 10);
   const user = await prisma.user.upsert({
     where: { id: userId },
     update: {},
