@@ -10,6 +10,10 @@ export class UserService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
   async signUp(user: SignInDto) {
+    const foundUser = await this.prisma.user.findUnique({
+      where: { email: user.email },
+    });
+    if (foundUser) throw new BadRequestException('User already exists');
     user.password = await bcrypt.hash(user.password, 10);
 
     const newUser = await this.prisma.user.create({
