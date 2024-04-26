@@ -48,6 +48,7 @@ export class VideoService {
     video.subtitle.subtitleLine.forEach((line) => {
       line.word.forEach((word) => {
         keywords.push({
+          id: word.id,
           japanese: word.japanese,
           chinese: word.chinese,
           timestampStart: line.timestampStart,
