@@ -67,6 +67,7 @@ model Word {
 
 model Quiz {
   id        Int       @id @default(autoincrement())
+  stepId    Int?
   videoId   Int
   videoUrl  String?   @db.VarChar(255)
   createdAt DateTime  @default(now())
