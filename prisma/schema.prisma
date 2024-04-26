@@ -66,17 +66,29 @@ model Word {
 }
 
 model Quiz {
+  id        Int       @id @default(autoincrement())
+  videoId   Int
+  videoUrl  String?   @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  subQuiz   SubQuiz[]
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId], name: "fk_quizzes_video_id")
+}
+
+model SubQuiz {
   id          Int      @id @default(autoincrement())
-  videoId     Int
-  videoUrl    String?  @db.VarChar(255)
+  quizId      Int
   description String   @db.VarChar(255)
   choice      Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
-  @@index([videoId], name: "fk_quizzes_video_id")
+  @@index([quizId], name: "fk_sub_quizzes_quiz_id")
 }
 
 model Step {
