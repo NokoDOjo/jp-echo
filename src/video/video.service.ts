@@ -40,7 +40,11 @@ export class VideoService {
             },
           },
         },
-        quiz: true,
+        quiz: {
+          include: {
+            subQuiz: true,
+          },
+        },
       },
     });
 

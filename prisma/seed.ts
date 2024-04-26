@@ -110,6 +110,104 @@ const stepsData = [
   },
 ];
 
+const firstSubquizList = [
+  {
+    id: 1,
+    quizId: 1,
+    description: '請問點餐的人說了什麼',
+    choice: [
+      { id: 1, content: 'すみません', isCorrect: true },
+      { id: 2, content: '大丈夫', isCorrect: false },
+      { id: 3, content: 'お願いします', isCorrect: false },
+    ],
+    timestampStart: 330000,
+    timestampEnd: 332000,
+  },
+  {
+    id: 2,
+    quizId: 1,
+    description: '請問點餐的人說了什麼',
+    choice: [
+      { id: 1, content: '英語のメニューありますか?', isCorrect: false },
+      { id: 2, content: '注文をお願いします。', isCorrect: true },
+      { id: 3, content: 'これ、お願いします。', isCorrect: false },
+    ],
+    timestampStart: 340000,
+    timestampEnd: 342000,
+  },
+  {
+    id: 3,
+    quizId: 1,
+    description: '請問服務生說了什麼',
+    choice: [
+      { id: 1, content: 'はい、少々お待ちください。', isCorrect: false },
+      { id: 2, content: 'おかい計をお願いします', isCorrect: false },
+      { id: 3, content: 'はい、かしこまりました。', isCorrect: true },
+    ],
+    timestampStart: 385000,
+    timestampEnd: 387000,
+  },
+];
+
+const secondSubquizList = [
+  {
+    id: 4,
+    quizId: 2,
+    description: '請問服務生說了甚麼',
+    choice: [
+      {
+        id: 1,
+        content: 'ありがとうございました、以上でよろしいですか？',
+        isCorrect: false,
+      },
+      {
+        id: 2,
+        content: 'かしこまりました、以上でよろしいですか？',
+        isCorrect: true,
+      },
+      {
+        id: 3,
+        content: '大丈夫です、以上でよろしいですか？',
+        isCorrect: false,
+      },
+    ],
+    timestampStart: 111000,
+    timestampEnd: 112000,
+  },
+  {
+    id: 5,
+    quizId: 2,
+    description: '請選出影片中的會話內容',
+    choice: [
+      { id: 1, content: '少々お待ちください?', isCorrect: false },
+      { id: 2, content: 'これを注文しました', isCorrect: true },
+      { id: 3, content: '何名様ですか', isCorrect: false },
+    ],
+    timestampStart: 143000,
+    timestampEnd: 146000,
+  },
+  {
+    id: 6,
+    quizId: 2,
+    description: '請問服務生說了什麼',
+    choice: [
+      {
+        id: 1,
+        content: '失礼いたします。おまたせいたしました',
+        isCorrect: true,
+      },
+      { id: 2, content: '失礼いたします。お伺いします', isCorrect: false },
+      {
+        id: 3,
+        content: '失礼いたします。少々お待ちください。',
+        isCorrect: false,
+      },
+    ],
+    timestampStart: 172000,
+    timestampEnd: 174000,
+  },
+];
+
 async function main() {
   const readFile = util.promisify(fs.readFile);
   const data = await readFile('src/common/srt/test.srt', 'utf8');
@@ -117,7 +215,7 @@ async function main() {
   const userId = randomUUID();
   const password = bcrypt.hashSync('Root12345678', 10);
   const user = await prisma.user.upsert({
-    where: { id: userId, email: 'root@example.com' },
+    where: { email: 'root@example.com' },
     update: {},
     create: {
       id: userId,
@@ -127,7 +225,7 @@ async function main() {
     },
   });
 
-  const video = await prisma.video.upsert({
+  const video1 = await prisma.video.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -138,22 +236,53 @@ async function main() {
     },
   });
 
-  const quiz = await prisma.quiz.upsert({
+  const video2 = await prisma.video.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      id: 2,
+      userId: user.id,
+      title: '日文點餐',
+      url: 'https://youtu.be/ZTMsWymcNVA',
+    },
+  });
+
+  const quiz1 = await prisma.quiz.upsert({
     where: { id: 1 },
     update: {},
     create: {
       id: 1,
-      description: '請問點餐的人說了什麼?',
-      choice: {
-        options: [
-          { id: 1, content: 'すみません', isCorrect: true },
-          { id: 2, content: '大丈夫', isCorrect: false },
-          { id: 3, content: 'お願いします', isCorrect: false },
-        ],
-      },
       videoId: 1,
+      stepId: 6,
     },
   });
+
+  for (const subQuiz of firstSubquizList) {
+    await prisma.subQuiz.upsert({
+      where: { id: subQuiz.id },
+      update: {},
+      create: subQuiz,
+    });
+  }
+
+  const quiz2 = await prisma.quiz.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      id: 2,
+      videoId: 1,
+      stepId: 7,
+      videoUrl: 'https://youtu.be/ZTMsWymcNVA',
+    },
+  });
+
+  for (const subQuiz of secondSubquizList) {
+    await prisma.subQuiz.upsert({
+      where: { id: subQuiz.id },
+      update: {},
+      create: subQuiz,
+    });
+  }
 
   const subtitle = await prisma.subtitle.upsert({
     where: { id: 1 },
