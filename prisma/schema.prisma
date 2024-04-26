@@ -79,12 +79,14 @@ model Quiz {
 }
 
 model SubQuiz {
-  id          Int      @id @default(autoincrement())
-  quizId      Int
-  description String   @db.VarChar(255)
-  choice      Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  id             Int      @id @default(autoincrement())
+  quizId         Int
+  description    String   @db.VarChar(255)
+  choice         Json
+  timestampStart Int
+  timestampEnd   Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
