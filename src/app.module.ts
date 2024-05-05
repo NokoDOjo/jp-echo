@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { StepModule } from './step/step.module';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
+import { QuizModule } from './quiz/quiz.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { VideoModule } from './video/video.module';
     StepModule,
     UserModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    QuizModule,
   ],
   controllers: [AppController],
   providers: [AppService],
