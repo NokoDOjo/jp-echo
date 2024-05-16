@@ -7,6 +7,7 @@ import { StepModule } from './step/step.module';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
 import { QuizModule } from './quiz/quiz.module';
+import { WordModule } from './word/word.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { QuizModule } from './quiz/quiz.module';
     UserModule,
     ConfigModule.forRoot({ isGlobal: true }),
     QuizModule,
+    WordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
