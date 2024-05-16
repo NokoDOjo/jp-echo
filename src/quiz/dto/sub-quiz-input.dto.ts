@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { ChoiceDto } from "./choice.dto";
 
 export class SubQuizInputDto {
     @ApiProperty()
@@ -9,4 +10,7 @@ export class SubQuizInputDto {
 
     @ApiProperty()
     timestampEnd: number;
+
+    @ApiProperty({ type: [ChoiceDto] })
+    choice: string;
 }
