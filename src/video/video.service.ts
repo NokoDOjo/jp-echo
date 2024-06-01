@@ -61,7 +61,7 @@ export class VideoService {
       });
     });
 
-    return { steps, url: video.url, keywords, quiz: video.quiz };
+    return { ...video, steps, keywords, quiz: video.quiz };
   }
 
   async getSubtitle(videoId: number) {
