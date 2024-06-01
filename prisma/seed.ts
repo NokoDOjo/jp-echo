@@ -233,6 +233,8 @@ async function main() {
       userId: user.id,
       title: '日文點餐',
       url: 'https://www.youtube.com/watch?v=vd6mwUSiS40',
+      timestampStart: 322000,
+      timestampEnd: 467000,
     },
   });
 
@@ -244,6 +246,8 @@ async function main() {
       userId: user.id,
       title: '日文點餐',
       url: 'https://youtu.be/ZTMsWymcNVA',
+      timestampStart: 100000,
+      timestampEnd: 220000,
     },
   });
 

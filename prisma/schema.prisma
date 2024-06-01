@@ -14,16 +14,18 @@ datasource db {
 }
 
 model Video {
-  id          Int       @id @default(autoincrement())
-  title       String    @db.VarChar(255)
-  description String?
-  url         String
-  userId      String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
-  subtitle    Subtitle?
-  quiz        Quiz[]
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(255)
+  description    String?
+  url            String
+  userId         String
+  timestampStart Int
+  timestampEnd   Int
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+  subtitle       Subtitle?
+  quiz           Quiz[]
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subtitle {
